@@ -49,14 +49,3 @@ if(gamma > (1 - conf) / 2) {
 ```
 
 Si `r decisione` per un livello di confidenza al `r paste0(conf * 100, "%")`
-
-# Esercizio 2  
-
-In uno studio per accertare l’efficacia di un programma di esercizi fisici per dimagrire, sono stati ottenuti i valori della riduzione di peso (in kg), relativi ad un campione casuale di 9 persone a cui era stato assegnato il suddetto programma per la durata di un mese. I dati sono riportati nel file Excel allegato (osservazione: valori negativi della riduzione di peso indicano aumento dello stesso).
-Verificare l’efficacia del programma di dimagrimento, mediante un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 1%.
-(suggerimento: fissare l’ipotesi nulla negando l’efficacia del programma).
-
-```{r es2}
-riduzione.peso <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio2")
-```
-
