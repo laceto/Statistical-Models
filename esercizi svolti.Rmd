@@ -55,3 +55,31 @@ Si `r decisione` per un livello di confidenza al `r paste0(conf * 100, "%")`
 In uno studio per accertare l’efficacia di un programma di esercizi fisici per dimagrire, sono stati ottenuti i valori della riduzione di peso (in kg), relativi ad un campione casuale di 9 persone a cui era stato assegnato il suddetto programma per la durata di un mese. I dati sono riportati nel file Excel allegato (osservazione: valori negativi della riduzione di peso indicano aumento dello stesso).
 Verificare l’efficacia del programma di dimagrimento, mediante un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 1%.
 (suggerimento: fissare l’ipotesi nulla negando l’efficacia del programma).
+
+H0: il programma non è efficace e la riduzione di peso = 0 ?????
+H1: il programma è efficace e la riduzione di peso è maggiore di zero ?????
+
+```{r es2}
+dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio2") %>%
+  dplyr::mutate(dimagrito = if_else(riduzione.peso > 0, "1", "0"))
+
+t.test(dati$riduzione.peso, alternative='less', mu=0, conf.level=0.99)
+
+
+
+n <- nrow(dati)
+est <- mean(dati$riduzione.peso)
+var <- sd(dati$riduzione.peso)^2
+mu.0 <- 0
+se <- sqrt(var)/sqrt(n)
+stat <- (est-mu.0)/se
+gamma <- pt(stat, df=n-1, lower.tail=TRUE)
+
+```
+
+
+
+
+
+
+
