@@ -65,8 +65,6 @@ dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio2") %>%
 
 t.test(dati$riduzione.peso, alternative='greater', mu=0, conf.level=0.99)
 
-
-
 n <- nrow(dati)
 est <- mean(dati$riduzione.peso)
 var <- sd(dati$riduzione.peso)^2
@@ -74,6 +72,7 @@ mu.0 <- 0
 se <- sqrt(var)/sqrt(n)
 stat <- (est-mu.0)/se
 gamma <- pt(stat, df=n-1, lower.tail=FALSE)
+
 
 if(gamma <= 0.01) {
   decisione <- "rifiuto H0"
