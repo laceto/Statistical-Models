@@ -398,7 +398,30 @@ a &lt;- ic[2]-ic[1]                                  #ampiezza</code></pre>
 <div id="esercizio-2" class="section level1">
 <h1>Esercizio 2</h1>
 <p>In uno studio per accertare l’efficacia di un programma di esercizi fisici per dimagrire, sono stati ottenuti i valori della riduzione di peso (in kg), relativi ad un campione casuale di 9 persone a cui era stato assegnato il suddetto programma per la durata di un mese. I dati sono riportati nel file Excel allegato (osservazione: valori negativi della riduzione di peso indicano aumento dello stesso). Verificare l’efficacia del programma di dimagrimento, mediante un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 1%. (suggerimento: fissare l’ipotesi nulla negando l’efficacia del programma).</p>
-<pre class="r"><code>riduzione.peso &lt;- readxl::read_xlsx(&quot;dati_verifica.xlsx&quot;, sheet = &quot;esercizio2&quot;)</code></pre>
+<p>Le ipotesi poste a verifica sono le seguenti:</p>
+<ul>
+<li>H0: il programma non è efficace e la riduzione di peso = 0</li>
+<li>H1: il programma è efficace e la riduzione di peso è &gt; 0</li>
+</ul>
+<p>Utilizzando la funzione t.test</p>
+<pre class="r"><code>t.test(dati$riduzione.peso, alternative=&#39;greater&#39;, mu=0, conf.level=0.99)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  dati$riduzione.peso
+## t = 2.5248, df = 8, p-value = 0.01777
+## alternative hypothesis: true mean is greater than 0
+## 99 percent confidence interval:
+##  -0.2666174        Inf
+## sample estimates:
+## mean of x 
+##  1.811111</code></pre>
+<pre><code>## [1] &quot;accetta H0&quot;</code></pre>
+<p>Si accetta H0 in quanto gamma (0.0177716) è maggiore di 0.01</p>
+</div>
+<div id="esercizio-3" class="section level1">
+<h1>Esercizio 3</h1>
+<p>In un campione casuale di 12 pazienti trattati con il farmaco A, media e deviazione standard campionarie del tasso di glicemia sono pari rispettivamente a 105 e 7.5, mentre in un campione casuale, indipendente dal primo, di 10 pazienti trattati con il farmaco B esse sono pari rispettivamente a 112 e 9.2. Stabilire se il farmaco A è da ritenersi più efficace del farmaco B nel ridurre il tasso di glicemia (la media del tasso di glicemia), mediante un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 5%. (suggerimento: fissare l’ipotesi nulla supponendo che i due farmaci hanno uguale efficacia).</p>
 </div>
 
 
