@@ -155,3 +155,12 @@ if(gamma <= 0.05) {
 }
 decisione
 ```
+# Esercizio 5  
+Da un’indagine di mercato su 600 famiglie è emerso che 390 di esse fanno la spesa alimentare nei grandi supermercati.
+Da studi preliminari, si suppone che il 60% delle famiglie, nella popolazione di riferimento, acquista i prodotti alimentari nei grandi supermercati.
+Per verificare tale supposizione, ricavare un intervallo di confidenza al 95%.
+Ripetere l’analisi mediante un intervallo di confidenza al 99%, e commentare opportunamente.
+
+```{r es5, echo=FALSE}
+prop.test(390, 600, p = 0.6, alternative = "less")
+```
