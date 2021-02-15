@@ -127,3 +127,31 @@ decisione
 Si formula l'ipotesi nulla che i due farmaci hanno uguale efficacia cioè che la media della glicemia nel gruppo A sia uguale alla media della glicemia nel gruppo B. Come ipotesi alternativa si assume che la differenza tra la media della glicemia nel gruppo A e la media della glicemia nel gruppo B è positiva.
 
 Si `r decisione` in quanto gamma (`r gamma`) è maggiore di 0.05 
+
+# Esercizio 4  
+Si vuole stabilire se un certo farmaco ha effetto per la cura dell’ipertensione. Si esegue un esperimento su un campione casuale di 11 pazienti, ciascuno dei quali è sottoposto a due trattamenti, il farmaco oggetto di studio ed un placebo, con relativa misurazione della pressione (sistolica). I dati sono riportati nel file Excel allegato.
+Per studiare l’effetto del farmaco, eseguire un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 5%, per verificare l’ipotesi nulla che il farmaco non è efficace.
+(suggerimento: nel fissare l’ipotesi nulla, e quella alternativa, si noti che la non efficacia del farmaco equivale all’uguaglianza delle medie di pressione relative al farmaco ed al placebo]
+
+```{r es4, echo=FALSE}
+dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio4") %>%
+  dplyr::mutate(differenza = pressione.placebo - pressione.farmaco)
+
+t.test(dati$pressione.placebo, dati$pressione.farmaco, alternative='greater', mu=0, conf.level=0.95)
+
+n <- nrow(dati)
+est <- mean(dati$differenza)
+var <- (sd(dati$differenza)^2)
+mu.0 <- 0
+se <- sqrt(var)/sqrt(n)
+stat <- (est-mu.0)/se
+gamma <- pt(stat, df=n-1, lower.tail=FALSE)
+
+
+if(gamma <= 0.05) {
+  decisione <- "rifiuta H0"
+} else {
+  decisione <- "accetta H0"
+}
+decisione
+```
