@@ -102,7 +102,7 @@ Stabilire se il farmaco A è da ritenersi più efficace del farmaco B nel ridurr
 ```{r es3}
 n1 <- 12
 n2 <- 10
-est1 <- 100
+est1 <- 105
 est2 <- 112
 var1 <- 7.5^2
 var2 <- 9.2^2
@@ -157,10 +157,23 @@ decisione
 ```
 # Esercizio 5  
 Da un’indagine di mercato su 600 famiglie è emerso che 390 di esse fanno la spesa alimentare nei grandi supermercati.
-Da studi preliminari, si suppone che il 60% delle famiglie, nella popolazione di riferimento, acquista i prodotti alimentari nei grandi supermercati.
+Da studi preliminari, si suppone che il 60% delle famiglie, nella popolazione di riferimento, acquista i prodotti alimentari 
+nei grandi supermercati.
 Per verificare tale supposizione, ricavare un intervallo di confidenza al 95%.
 Ripetere l’analisi mediante un intervallo di confidenza al 99%, e commentare opportunamente.
 
 ```{r es5, echo=FALSE}
-prop.test(390, 600, p = 0.6, alternative = "less")
+n <- 600
+n.succ <- 390
+conf <- 0.95
+est <- n.succ / n
+se <- sqrt(est * (1 - est) / n)
+q <- qnorm((1 - conf)/2, mean =0, sd =1, lower.tail = F)
+ic <- c(est - q * se, est + q * se)
+
+
+conf <- 0.99
+q <- qnorm((1 - conf)/2, mean =0, sd =1, lower.tail = F)
+ic <- c(est - q * se, est + q * se)
+
 ```
