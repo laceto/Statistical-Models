@@ -177,3 +177,13 @@ q <- qnorm((1 - conf)/2, mean =0, sd =1, lower.tail = F)
 ic <- c(est - q * se, est + q * se)
 
 ```
+
+# Esercizio 6
+In un campione casuale di 83 studenti universitari è stato osservato un numero di fumatori pari a 23; 
+in un campione casuale, indipendente dal primo, di 108 studentesse, il numero di fumatrici è risultato pari a 26.
+Stabilire se, nelle popolazioni di riferimento, le proporzioni dei fumatori e delle fumatrici si equivalgono o meno, attraverso un intervallo di confidenza al 95%.
+
+```{r es6, echo=FALSE}
+prop.test(c(23,26),c(83,108), conf.level =0.95)
+
+```
