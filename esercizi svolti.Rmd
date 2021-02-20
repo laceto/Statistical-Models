@@ -1,5 +1,5 @@
 ---
-title: "esercizi"
+title: "esercizi statistical models - Cossari"
 author: "Luigi Aceto"
 date: "2/2/2021"
 output: html_document
@@ -28,27 +28,27 @@ a <- ic[2]-ic[1]                                  #ampiezza
 ```
 L'intervallo di confidenza al `r paste0(conf * 100, "%")` risulta essere `r paste0(round(ic[1], 3), ";", round(ic[2], 3))` e contiene il ph nominale specificato dal produttore.  
 
-Si può verificare l'ipotesi nulla che la media campionaria non è statisticamente diversa dal valore nominale del ph utilizzando un test di ipotesi bilaterale.
 
 ```{r es1_soluzione, echo = FALSE}
-
-stat <- (est-mu.0)/se  # se stat ha valore positivo --> test bilaterale --> lower.tail = FALSE
-
-if (stat > 0){
-  gamma <- pt(stat, df=n-1, lower.tail=FALSE)
-} else {
-  gamma <- pt(stat, df=n-1, lower.tail=TRUE)
-}
-
-if(gamma > (1 - conf) / 2) {
-  decisione <- "accetta H0"
-} else {
-  decisione <- "rifiuta H0"
-}
- 
+# Si può verificare l'ipotesi nulla che la media campionaria non è statisticamente diversa dal valore nominale del ph utilizzando un test di ipotesi bilaterale.
+# 
+# stat <- (est-mu.0)/se  # se stat ha valore positivo --> test bilaterale --> lower.tail = FALSE
+# 
+# if (stat > 0){
+#   gamma <- pt(stat, df=n-1, lower.tail=FALSE)
+# } else {
+#   gamma <- pt(stat, df=n-1, lower.tail=TRUE)
+# }
+# 
+# if(gamma > (1 - conf) / 2) {
+#   decisione <- "accetta H0"
+# } else {
+#   decisione <- "rifiuta H0"
+# }
+# Si `r decisione` per un livello di confidenza al `r paste0(conf * 100, "%")`
 ```
 
-Si `r decisione` per un livello di confidenza al `r paste0(conf * 100, "%")`
+
 
 # Esercizio 2
 
@@ -66,14 +66,7 @@ dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio2") %>%
   dplyr::mutate(dimagrito = if_else(riduzione.peso > 0, "1", "0"))
 ```
 
-Utilizzando la funzione t.test
-
-```{r es2_2}
-
-t.test(dati$riduzione.peso, alternative='greater', mu=0, conf.level=0.99)
-```
-
-```{r es2_3, echo=FALSE}
+```{r es2_3}
 
 n <- nrow(dati)
 est <- mean(dati$riduzione.peso)
@@ -89,15 +82,20 @@ if(gamma <= 0.01) {
 } else {
   decisione <- "accetta H0"
 }
-decisione
+
 ```
-Si `r decisione` in quanto gamma (`r gamma`) è maggiore di 0.01  
+Si `r decisione` in quanto gamma (`r gamma`) è maggiore di 0.01.  
 
 # Esercizio 3
 
 In un campione casuale di 12 pazienti trattati con il farmaco A, media e deviazione standard campionarie del tasso di glicemia sono pari rispettivamente a 105 e 7.5, mentre in un campione casuale, indipendente dal primo, di 10 pazienti trattati con il farmaco B esse sono pari rispettivamente a 112 e 9.2.
 Stabilire se il farmaco A è da ritenersi più efficace del farmaco B nel ridurre il tasso di glicemia (la media del tasso di glicemia), mediante un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 5%.
-(suggerimento: fissare l’ipotesi nulla supponendo che i due farmaci hanno uguale efficacia).
+(suggerimento: fissare l’ipotesi nulla supponendo che i due farmaci hanno uguale efficacia).  
+
+Le ipotesi poste a verifica sono le seguenti:  
+
+- H0: i farmaci hanno uguale efficacia quindi la differenza della glicemia media con i due farmaci è nulla (H0: muA - muB = 0)
+- H1: il farmaco A è più efficace del farmaco B quindi il tasso di glicemia media osservato sul campione trattato col farmaco A è minore del tasso di glicemia media osservato sul campione trattato col farmaco B (H1: muA < muB --> muA - muB < 0)
 
 ```{r es3}
 n1 <- 12
@@ -111,33 +109,32 @@ est <- est1 - est2
 var <- ((n1 - 1)* var1 + (n2 - 1) * var2) / gl
 se <- sqrt(var) * sqrt((1 / n1) + (1 / n2))
 
-stat <- est / (var * se)
+stat <- est / (se)
 
-gamma <- pt(stat , df = gl, lower.tail = FALSE)
+gamma <- pt(stat , df = gl, lower.tail = TRUE)
 
 if(gamma <= 0.05) {
   decisione <- "rifiuta H0"
 } else {
   decisione <- "accetta H0"
 }
-decisione
-
 
 ```
-Si formula l'ipotesi nulla che i due farmaci hanno uguale efficacia cioè che la media della glicemia nel gruppo A sia uguale alla media della glicemia nel gruppo B. Come ipotesi alternativa si assume che la differenza tra la media della glicemia nel gruppo A e la media della glicemia nel gruppo B è positiva.
-
-Si `r decisione` in quanto gamma (`r gamma`) è maggiore di 0.05 
+Si `r decisione` in quanto gamma (`r gamma`) è minore di 0.05 
 
 # Esercizio 4  
 Si vuole stabilire se un certo farmaco ha effetto per la cura dell’ipertensione. Si esegue un esperimento su un campione casuale di 11 pazienti, ciascuno dei quali è sottoposto a due trattamenti, il farmaco oggetto di studio ed un placebo, con relativa misurazione della pressione (sistolica). I dati sono riportati nel file Excel allegato.
 Per studiare l’effetto del farmaco, eseguire un opportuno test unilaterale (stabilire se a coda destra o a coda sinistra), al livello di significatività del 5%, per verificare l’ipotesi nulla che il farmaco non è efficace.
 (suggerimento: nel fissare l’ipotesi nulla, e quella alternativa, si noti che la non efficacia del farmaco equivale all’uguaglianza delle medie di pressione relative al farmaco ed al placebo]
 
-```{r es4, echo=FALSE}
+Le ipotesi poste a verifica sono le seguenti:  
+
+- H0: i due trattamenti hanno uguale efficacia quindi la differenza della pressione media con i due trattamenti è nulla (H0: muF - muP = 0)
+- H1: il farmaco è efficace quindi la pressione media osservata sul campione trattato col farmaco è minore della pressione media osservato sul campione trattato col placebo (H1: muF < muP --> muF - muP < 0)
+
+```{r es4}
 dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio4") %>%
   dplyr::mutate(differenza = pressione.placebo - pressione.farmaco)
-
-t.test(dati$pressione.placebo, dati$pressione.farmaco, alternative='greater', mu=0, conf.level=0.95)
 
 n <- nrow(dati)
 est <- mean(dati$differenza)
@@ -148,21 +145,23 @@ stat <- (est-mu.0)/se
 gamma <- pt(stat, df=n-1, lower.tail=FALSE)
 
 
-if(gamma <= 0.05) {
+if(gamma < 0.05) {
   decisione <- "rifiuta H0"
 } else {
   decisione <- "accetta H0"
 }
-decisione
+
 ```
+Si `r decisione` in quanto gamma (`r gamma`) è minore di 0.05.  
+
 # Esercizio 5  
 Da un’indagine di mercato su 600 famiglie è emerso che 390 di esse fanno la spesa alimentare nei grandi supermercati.
 Da studi preliminari, si suppone che il 60% delle famiglie, nella popolazione di riferimento, acquista i prodotti alimentari 
 nei grandi supermercati.
-Per verificare tale supposizione, ricavare un intervallo di confidenza al 95%.
+Per verificare tale supposizione, ricavare un intervallo di confidenza al 95%.  
 Ripetere l’analisi mediante un intervallo di confidenza al 99%, e commentare opportunamente.
 
-```{r es5, echo=FALSE}
+```{r es5}
 n <- 600
 n.succ <- 390
 conf <- 0.95
@@ -171,12 +170,13 @@ se <- sqrt(est * (1 - est) / n)
 q <- qnorm((1 - conf)/2, mean =0, sd =1, lower.tail = F)
 ic <- c(est - q * se, est + q * se)
 
-
 conf <- 0.99
 q <- qnorm((1 - conf)/2, mean =0, sd =1, lower.tail = F)
-ic <- c(est - q * se, est + q * se)
+ic2 <- c(est - q * se, est + q * se)
 
 ```
+Il primo intervallo di confidenza è `r round(ic, 5)`.  
+Il secondo intervallo di confidenza è `r round(ic2, 5)`.  
 
 # Esercizio 6
 In un campione casuale di 83 studenti universitari è stato osservato un numero di fumatori pari a 23; 
@@ -184,9 +184,25 @@ in un campione casuale, indipendente dal primo, di 108 studentesse, il numero di
 Stabilire se, nelle popolazioni di riferimento, le proporzioni dei fumatori e delle fumatrici si equivalgono o meno, attraverso un intervallo di confidenza al 95%.
 
 ```{r es6, echo=FALSE}
-prop.test(c(23,26),c(83,108), conf.level =0.95)
-
+# n1 <- 83
+# n2 <- 108
+# suc1 <- 23
+# suc2 <- 26
+# conf <- 0.95
+# est1 <- suc1 / n1
+# est2 <- suc2 / n2
+# est <- est1 - est2
+# se <- sqrt(est1 * (1 - est1) / n1 + est2 * (1 - est2) / n2)
+# q <- qnorm((1 - conf) / 2, mean = 0, sd = 1, lower.tail = FALSE)
+# ic <- c(est - q * se, est + q * se)
+# 
+# ic <- prop.test(c(23,26),c(83,108), conf.level = 0.95)
+# 
+# ic$conf.int
 ```
+
+
+
 # Esercizio 7
 In uno studio sulle famiglie calabresi, è stato registrato il numero di figli per un campione numeroso di famiglie selezionate casualmente. 
 I dati sono riportati nel file Excel allegato.
@@ -195,7 +211,22 @@ Per misurare l’ordine di grandezza del numero di figli nelle famiglie calabres
 ```{r es7, echo=FALSE}
 dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio7")
 
-t.test(dati$n.figli, alternative = "two.sided", mu = 0, conf.level = 0.95)
+ic <- t.test(dati$n.figli, alternative = "two.sided", mu = 0, conf.level = 0.95)
 
 ```
+
+L'intervallo di confidenza per il numero di figli al livello di significatività al 95% è [`r round(ic$conf.int[1],3)`, `r round(ic$conf.int[2],3)`].
+
+# Esercizio 8 
+Per accertare se c’è differenza di trattamento economico tra gli operai di una fabbrica, in due stabilimenti diversi A e B, è stato esaminato un gruppo numeroso di operai, scelti casualmente tra quelli dei due stabilimenti, registrando per ciascuno di essi lo stabilimento di provenienza e lo stipendio medio mensile. I dati sono riportati nel file Excel allegato.
+Verificare se esiste differenza di trattamento economico, eseguendo un test bilaterale al livello di significatività del 1%.
+
+```{r es8, echo=FALSE}
+dati <- readxl::read_xlsx("dati_verifica.xlsx", sheet = "esercizio8")
+
+t.test(stipendio ~ stabilimento, alternative = "two.sided", conf.level=0.99, var.equal=FALSE, data = dati)
+
+```
+
+Il p_value è molto più basso del livello di significatività, quindi si rifiuta l'ipotesi che non ci sia differenza di trattamento economico tra gli operai dei due diversi stabilimenti.  
 
