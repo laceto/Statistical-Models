@@ -1,0 +1,328 @@
+---
+title: "esercitazione statistical models"
+author: "| Luigi Aceto |"
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: show
+    highlight: tango
+    keep_md: no
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_float: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  github_document:
+    toc: yes
+
+---
+
+```{r, include=FALSE}
+options(scipen=999)
+knitr::opts_chunk$set(echo = TRUE, 
+                      include = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      # fig.width = 6, 
+                      # fig.height = 6, 
+                      comment = F)
+library(tidymodels)
+library(tidyverse)
+library(palmerpenguins)
+library(kableExtra)
+library(DT)
+```
+
+# Penguins dataset  
+
+Il dataset oggetto di analisi è incluso nel pacchetto [**palmerpenguins**](https://allisonhorst.github.io/palmerpenguins/) e contiene osservazioni sui pinguini antartici che vivono nell'[**arcipelago delle isole Palmer**](https://www.google.com/maps/place/Palmer+Archipelago,+Antartide/data=!4m2!3m1!1s0xbc78dd6dc38c572b:0xe609367aeed33087?sa=X&ved=2ahUKEwiCy4OEofjuAhXLyaQKHeV1AlIQ8gEwFnoECB0QAQ).  
+
+L'obiettivo della modellizzazione statistica è quello di predire il sesso dei pinguini utilizzando un modello di classificazione basato sulle altre caratteristiche osservate presenti nel dataset.   
+
+Nel caso in cui si volesse creare un modello di classificazione per la specie, si otterrebbe molto probabilmente un fitting perfetto in quanto le variabili osservate sono quelle che effettivamente distinguono le diverse specie.  
+
+Il sesso è un pò più incasinato.  
+
+```{r, echo=FALSE, include=TRUE}
+penguins <- penguins %>%
+  tidyr::drop_na()
+
+penguins %>%
+  DT::datatable(extensions = 'Buttons', 
+                options = list(dom = 'Bfrtip',
+                               buttons = c('excel', "csv")
+                               )
+                )
+
+
+```
+
+# Penguins species {.tabset}   
+
+Sono state osservate tre specie di pinguini e le proporzioni di ogni specie sul totale sono rappresentate del seguente grafico.  
+
+```{r, echo=FALSE, include=TRUE}
+
+penguins %>%
+  dplyr::count(species) %>%
+  dplyr::mutate(prop = round(n * 100 / sum(n), 1),
+                lab.ypos = cumsum(prop) - 0.5 * prop) %>%
+  ggplot(.,
+       aes(
+         x = "",
+         y = prop,
+         fill = species
+       )) + 
+  geom_bar(width = 1,
+           stat = "identity",
+           color = "black") + 
+  coord_polar("y",
+              start = 0,
+              direction = -1) +
+  theme_void()
+
+
+```
+
+## Adelie
+
+```{r, echo=FALSE, include=TRUE}
+knitr::include_graphics("./images/Adelie-pinguin.jpg")
+```
+
+## Chinstrap
+
+```{r, echo=FALSE, include=TRUE}
+knitr::include_graphics("./images/Chinstrap-pinguin.jpg")
+```
+
+## Gentoo
+
+```{r, echo=FALSE, include=TRUE}
+knitr::include_graphics("./images/Gentoo_pinguin.jpg")
+```
+
+# Features {.tabset}   
+Le variabili osservate sono la lunghezza e la profondità del becco, la lunghezza delle pinne, il sesso e il peso.  
+
+## Bill length 
+
+```{r, echo=FALSE, include=TRUE}
+
+p <- ggplot(penguins, aes(x=species, y=bill_length_mm, color=species)) + 
+    geom_violin(trim=FALSE)
+p + stat_summary(fun.data="mean_sdl", mult=1, 
+                 geom="crossbar", width=0.2 ) + 
+  geom_dotplot(binaxis='y', stackdir='center', dotsize=1) + 
+  facet_wrap(~sex)
+```
+
+## Bill depth 
+
+```{r, echo=FALSE, include=TRUE}
+
+p <- ggplot(penguins, aes(x=species, y=bill_depth_mm, color=species)) + 
+    geom_violin(trim=FALSE)
+p + stat_summary(fun.data="mean_sdl", mult=1, 
+                 geom="crossbar", width=0.2 ) + 
+  geom_dotplot(binaxis='y', stackdir='center', dotsize=1) + 
+  facet_wrap(~sex)
+```
+
+## Flipper length 
+
+```{r, echo=FALSE, include=TRUE}
+
+p <- ggplot(penguins, aes(x=species, y=flipper_length_mm, color=species)) + 
+    geom_violin(trim=FALSE)
+p + stat_summary(fun.data="mean_sdl", mult=1, 
+                 geom="crossbar", width=0.2 ) + 
+  geom_dotplot(binaxis='y', stackdir='center', dotsize=1) + 
+  facet_wrap(~sex)
+```
+
+## Body mass 
+
+```{r, echo=FALSE, include=TRUE}
+
+p <- ggplot(penguins, aes(x=species, y=body_mass_g, color=species)) + 
+    geom_violin(trim=FALSE)
+p + stat_summary(fun.data="mean_sdl", mult=1, 
+                 geom="crossbar", width=0.2 ) + 
+  geom_dotplot(binaxis='y', stackdir='center', dotsize=1) + 
+  facet_wrap(~sex)
+```
+
+## Flipper and bill length 
+
+```{r, echo=FALSE, include=TRUE}
+
+penguins %>%
+  filter(!is.na(sex)) %>%
+  ggplot(aes(flipper_length_mm, bill_length_mm, color = sex, size = body_mass_g)) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~species)
+```
+
+## Flipper and bill depth 
+
+```{r, echo=FALSE, include=TRUE}
+
+penguins %>%
+  filter(!is.na(sex)) %>%
+  ggplot(aes(flipper_length_mm, bill_depth_mm, color = sex, size = body_mass_g)) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~species)
+```
+
+## Bill length and bill depth 
+
+```{r, echo=FALSE, include=TRUE}
+
+penguins %>%
+  filter(!is.na(sex)) %>%
+  ggplot(aes(bill_depth_mm, bill_length_mm, color = sex, size = body_mass_g)) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~species)
+```
+
+
+```{r, include=FALSE}
+
+```
+
+# Splitting dataset  
+
+Il dataset è stato suddiviso in training e testing dataset (75/25) con il metodo stratificato utilizzando come variabile il sesso.  
+Quindi, la proporzione dei sessi è uguale tra i due dataset ottenuti.  
+Le righe contenenti NA sono state rimosse.  
+Le colonne anno e isola sono state rimosse.  
+
+```{r}
+
+penguins_df <- penguins %>%
+  filter(!is.na(sex)) %>%
+  select(-year, -island)
+# 
+# penguins_df %>%
+#   dplyr::count(sex) %>%
+#   dplyr::mutate(prop = n / sum(n))
+# 
+set.seed(123)
+penguin_split <- initial_split(penguins_df, strata = sex)
+penguin_train <- training(penguin_split)
+penguin_test <- testing(penguin_split)
+
+```
+# Modelling    
+
+25 bootstraps sono stati creati dal training dataset e su questi è allenato un modello di regressione logistica  
+
+```{r}
+set.seed(123)
+penguin_boot <- bootstraps(penguin_train)
+# penguin_boot
+```
+
+```{r}
+glm_spec <- logistic_reg() %>%
+  set_engine("glm")
+# 
+# glm_spec
+```
+
+
+```{r}
+penguin_wf <- workflow() %>%
+  add_formula(sex ~ .)
+# 
+# penguin_wf
+```
+
+# Training performance  
+
+I risultati sono abbastanza soddisfacenti come risulta dalla matrice che riepiloga le metriche utilizzate nel fitting del modello sui vari training dataset.  
+
+```{r, echo=FALSE, include=TRUE}
+glm_rs <- penguin_wf %>%
+  add_model(glm_spec) %>%
+  fit_resamples(
+    resamples = penguin_boot,
+    control = control_resamples(save_pred = TRUE)
+  )
+
+collect_metrics(glm_rs) %>%
+  kable(., align = "c") %>%
+  kable_styling(full_width = T)
+```
+
+```{r}
+# glm_rs %>%
+#   conf_mat_resampled()
+```
+
+# ROC curve  
+
+Le curve di ROC dimostrano la bonta del fitting del modello di regressione logistica nel discriminare il sesso dei pinguini.  
+
+```{r, echo=FALSE, include=TRUE}
+
+glm_rs %>%
+  collect_predictions() %>%
+  group_by(id) %>%
+  roc_curve(sex, .pred_female) %>%
+  ggplot(aes(1 - specificity, sensitivity, color = id)) +
+  geom_abline(lty = 2, color = "gray80", size = 1.5) +
+  geom_path(show.legend = FALSE, alpha = 0.6, size = 1.2) +
+  coord_equal()
+```
+
+# Evaluation on testing  
+
+Il modello è quindi valutato sul testing dataset e la performance è soddisfacente anche su nuovi dati mai visti dal modello. 
+
+```{r}
+penguin_final <- penguin_wf %>%
+  add_model(glm_spec) %>%
+  last_fit(penguin_split)
+```
+
+```{r, echo=FALSE, include=TRUE}
+collect_metrics(penguin_final) %>%
+  kable(., align = "c") %>%
+  kable_styling(full_width = T)
+```
+
+La matrice di confusione che si ottine è la seguente  
+
+```{r, echo=FALSE, include=TRUE}
+
+collect_predictions(penguin_final) %>%
+  conf_mat(sex, .pred_class)
+```
+
+# Model specification   
+
+L'odds ratio (esponenziale dei coefficienti) più elevato è riferito alla profondità del becco mentre il secondo più grande è quello associato alla lunghezza del becco.  
+Questo vuol dire che un incremento di 1mm della profondità del becco corrisponde a quasi un odds 4 volte maggiore di essere un pinguino maschio. 
+Quindi le caratteristiche del becco sono quelle che discriminano di più i pinguini in base al sesso.  
+Non ci sono forti evidenze per le pinne e il peso.  
+
+```{r, echo=FALSE, include=TRUE}
+# The largest odds ratio is for bill depth, with the second largest for bill length.
+# An increase of 1 mm in bill depth corresponds to almost 4x higher odds of being male. The characteristics of a penguin’s bill must be associated with their sex.
+# We don’t have strong evidence that flipper length is different between male and female penguins, controlling for the other measures; maybe we should explore that by changing that first plot!
+
+penguin_final$.workflow[[1]] %>%
+  tidy(exponentiate = TRUE) %>%
+  tidyr::pivot_longer(cols = c("estimate":"p.value"), names_to = "tidy_stat") %>%
+  dplyr::mutate(value = round(value, 5)) %>%
+  tidyr::pivot_wider(names_from = "tidy_stat", values_from = "value") %>%
+  kable(., align = "c") %>%
+  kable_styling(full_width = T)
+
+```
+
